@@ -26,7 +26,7 @@ const mongoose = require('mongoose')
 async function connect() {
     try {
         const conn = await mongoose.connect(
-            "mongodb+srv://kholidasad:wakswaks@cluster0.5d56n.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+            process.env.MONGO_URI
         )
         console.log(`Mongo Connected : ${ conn.connection.host }`)
     } catch (err) {

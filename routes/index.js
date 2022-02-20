@@ -20,6 +20,7 @@ router.get('/detail', UserController.userDetail)
 
 //product
 router.post('/product/create', verify, ProductController.create)
+router.post('/product/many', verify, ProductController.createMany)
 router.get('/product', ProductController.index)
 router.get('/product/find', ProductController.findOne)
 router.put('/product/update/:id', ProductController.update)

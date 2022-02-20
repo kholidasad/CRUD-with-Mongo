@@ -27,6 +27,28 @@ module.exports = {
                 })
             })
     },
+
+    async createMany(req, res) {
+        let UID = id._id
+        let collect = req.body.collection
+        for(let i = 0; i < collect.length; i++) {
+            collect[i].UID = UID
+        }
+
+        await Product.insertMany(collect).then((data) => {
+            res.send({
+                status: 200,
+                message: 'Created Successfully!',
+                result: data
+            })
+        })
+        .catch((err) => {
+            res.send({
+                status: 500,
+                message: 'Internal Server Error!'
+            })
+        })
+    },
     
     async index(req, res) {
         const productIndex = await Product.find({})
@@ -80,7 +102,7 @@ module.exports = {
             })
         })
     },
-    
+
     async delete(req, res) {
         const productDelete = await Product.findByIdAndDelete(req.params.id)
         .then((data) => {
@@ -95,27 +117,5 @@ module.exports = {
                 message: 'Data not found!'
             })
         })
-    },
-    
-    // async findByUser(req, res) {
-    //     // let hasil = id
-
-    //     const findUser = await User.aggregate([
-    //         // {
-    //         //     $match: {
-    //         //         'name': 'Ini Budi'
-    //         //     }
-    //         // },
-    //         {
-    //             $lookup: 
-    //             {
-    //                 from: "products",
-    //                 localField: "_id",
-    //                 foreignField: "UID",
-    //                 as: "list_products"
-    //             }
-    //         }
-    //     ])
-    //     res.send(findUser)
-    // }
+    }
 }

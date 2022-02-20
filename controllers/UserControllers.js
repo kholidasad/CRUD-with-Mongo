@@ -2,6 +2,7 @@ const User = require('../mongodb/models/users')
 // const mongo = require('../config/mongo')
 const ObjectId = require('mongodb').ObjectId
 const bcrypt = require('bcrypt')
+const {sendEmail} = require('../middleware/emailSender')
 
 module.exports = {
     async index(req, res) {
@@ -37,6 +38,14 @@ module.exports = {
 
         try {
             await userInsert.save(userInsert)
+
+            await sendEmail(
+                email,
+                'Registration Success',
+                'You have successfully registered',
+                `<b>Welcome ${userInsert.name}</b>`
+            )
+
             res.status(200).json(userInsert)
         } catch (err) {
             console.log(err);

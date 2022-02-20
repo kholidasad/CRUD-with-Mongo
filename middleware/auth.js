@@ -25,8 +25,7 @@ const verify = async (req, res, next) => {
 
 const generate = (payload) => {
     return jwt.sign(payload, privateKey, {
-        algorithm: 'HS256',
-        expiresIn: '1m'
+        algorithm: 'HS256'
     })
 }
 

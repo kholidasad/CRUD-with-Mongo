@@ -4,6 +4,7 @@ const User = require('../mongodb/models/users')
 const cryptr = require('cryptr')
 const { response } = require('express')
 const CTR = new cryptr('wakswaks')
+const {sendEmail} = require('../middleware/emailSender')
 
 module.exports = {
     async login (req, res) {
@@ -39,40 +40,43 @@ module.exports = {
     },
 
     async register (req, res) {
-        await User.find({ 'email': req.body.email }).then(async data => {
-            if (data == 0) {
-                const cryptPass = CTR.encrypt(req.body.password)
-                const registerUser = new User({
-                    'name': req.body.name,
-                    'email': req.body.email,
-                    'password': cryptPass
-                })
-
-                await registerUser.save(registerUser).then(hasil => {
-                    res.send({
-                        message: 'Data has been created!',
-                        status: 200,
-                        result: hasil
-                    })
-                }).catch(err => { 
-                    res.send({
-                        message: 'Internal Server Error',
-                        status: 500,
-                        messageErr: err.message
-                    })
-                })
-            } else {
-                res.send({
-                    message: 'Data exist'
+        try {
+            const findUser = await User.find({ 'email': req.body.email })
+            
+            if(!findUser) {
+                res.status(400).json({
+                    status: 400,
+                    message: 'Data not found!'
                 })
             }
-        })
-        .catch(err => {
+
+            const cryptPass = CTR.encrypt(req.body.password)
+            const registerUser = new User({
+                name: req.body.name,
+                email: req.body.email,
+                password: cryptPass
+            })
+
+            await registerUser.save(registerUser)
+
+            await sendEmail(
+                registerUser.email,
+                'Registration Success',
+                'You have successfully registered',
+                `<b>Welcome ${registerUser.name}</b>`
+            )
+
+            res.status(200).json({
+                status: 200,
+                message: 'Success',
+                result: registerUser
+            })
+        } catch (error) {
             res.send({
                 message: 'Internal Server Error',
                 status: 500,
-                messageErr: err.message
+                messageErr: error.message
             })
-        })
+        }
     }
 }
